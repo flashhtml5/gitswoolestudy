@@ -1,6 +1,6 @@
 <?php
 $client = new swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_SYNC); //同步阻塞
-$ret = $client->connect('127.0.0.1', 9501, 0.5);
+$ret = $client->connect('127.0.0.1', 10000, 0.5);
 if(!$ret)
 {
 	echo "#Connect failed.  errno=".$client->errCode;

@@ -7,11 +7,11 @@ class ProxyServer
 
     function run()
     {
-        $serv = new swoole_server("127.0.0.1", 9509);
+        $serv = new swoole_server("0.0.0.0", 10000);
         $serv->set(array(
             'timeout' => 1, //select and epoll_wait timeout.
             'poll_thread_num' => 1, //reactor thread num
-            'worker_num' => 32, //reactor thread num
+            'worker_num' => 2, //reactor thread num
             'backlog' => 128, //listen backlog
             'max_conn' => 10000,
             'dispatch_mode' => 2,
@@ -52,13 +52,22 @@ class ProxyServer
     function onReceive($serv, $fd, $from_id, $data)
     {
 		$socket = new swoole_client(SWOOLE_SOCK_TCP);
-        if($socket->connect('127.0.0.1', 80, 0.5))
+		echo "send data:\n".$data."\n";
+        if($socket->connect('www.baidu.com', 80, 1))
         {
 			$socket->send($data);
-			$serv->send($fd, $socket->recv(8192, 0));
+
+			while (1) {
+				$recv= $socket->recv(8000, 0);
+				echo "recv data:\n".$recv."\n";
+				if(strlen($recv)>0){
+					$serv->send($fd, $recv);
+				}
+				
+			}
 		}
-        unset($socket);
-        $serv->close($fd);
+//         unset($socket);
+//         $serv->close($fd);
     }
 }
 
