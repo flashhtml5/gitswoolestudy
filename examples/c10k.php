@@ -9,9 +9,9 @@ for($j = 0; $j < 1; $j++)
 	}
 	else
 	{
-		for($i = 0; $i < 9999; $i++){
+		for($i = 0; $i < 5000; $i++){
 			$client = new swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_SYNC); //同步阻塞
-			$ret = $client->connect('127.0.0.1', 9501, 0.5);
+			$ret = $client->connect('127.0.0.1', 10000, 0.5);
 			if(!$ret)
 			{
 				echo "#$i\tConnect fail.  errno=".$client->errCode;
