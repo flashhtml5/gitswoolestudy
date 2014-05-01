@@ -4,7 +4,7 @@
 
 	$serv = new swoole_server("0.0.0.0", 843);
 	$serv->addlistener('0.0.0.0', 11843,SWOOLE_SOCK_TCP);
-	
+	echo "Flash 843 Server v 0.1  By 709653949@qq.com admin at 11843  start ....\n";
 	$serv->set(array(
 	    'worker_num' => 1,   //工作进程数量
 	    'daemonize' => false, //是否作为守护进程
