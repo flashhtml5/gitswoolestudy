@@ -5,7 +5,7 @@
 	$serv = new swoole_server("0.0.0.0", 10000);
 	echo "BenchServer v 0.1  By 709653949@qq.com admin at 10000  start ....\n";
 	$serv->set(array(
-	    'worker_num' => 10,   //工作进程数量
+	    'worker_num' => 1,   //工作进程数量
 	    'daemonize' => false, //是否作为守护进程
 	));
 	$serv->on('connect', function ($serv, $fd){

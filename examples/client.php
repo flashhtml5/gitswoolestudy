@@ -1,9 +1,9 @@
 <?php
 $clients = array();
-for($i=0; $i< 2; $i++)
+for($i=0; $i< 1024; $i++)
 {
     $client = new swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_SYNC); //同步阻塞
-    $ret = $client->connect('127.0.0.1', 9501, 0.5, 0);
+    $ret = $client->connect('127.0.0.1', 10000, 0.5, 0);
     if(!$ret)
     {
         echo "Connect Server fail.errCode=".$client->errCode;
@@ -24,7 +24,7 @@ while(!empty($clients))
 	{
 		foreach($read as $index=>$c)
 		{
-			echo "Recv #{$c->sock}: ".$c->recv()."\n";
+// 			echo "Recv #{$c->sock}: ".$c->recv()."\n";
 			unset($clients[$c->sock]);
 		}
 	}
