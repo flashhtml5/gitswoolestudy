@@ -10,7 +10,7 @@ else
 }
 
 $_s = microtime(true);
-if(!$client->connect('127.0.0.1', 9501))
+if(!$client->connect('0.0.0.0', 10000))
 {
 	exit("connect fail\n");
 }
