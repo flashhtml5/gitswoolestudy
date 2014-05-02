@@ -1,10 +1,10 @@
 <?php
-$serv = new swoole_server("127.0.0.1", 9501);
+$serv = new swoole_server("0.0.0.0", 10000);
 $serv->set(array(
-    'worker_num' => 2,
+    'worker_num' => 1,
     //'open_eof_check' => true,
     //'package_eof' => "\r\n",
-    'task_worker_num' => 2,
+    'task_worker_num' => 1,
 	//'dispatch_mode' => 2,
 	//'daemonize' => 1,
     //'heartbeat_idle_time' => 5,
@@ -29,13 +29,13 @@ function my_onTimer($serv, $interval)
 
 function my_onClose($serv, $fd, $from_id)
 {
-	//echo "Client: fd=$fd is closed.\n";
+	echo "Client: fd=$fd is closed.\n";
 }
 
 function my_onConnect($serv, $fd, $from_id)
 {
 	//throw new Exception("hello world");
-// 	echo "Client:Connect.\n";
+	echo "Client:Connect.\n";
 }
 
 
@@ -44,9 +44,15 @@ function my_onWorkerStart($serv, $worker_id)
 {
     global $argv;
     global $class;
-    opcache_reset();
+//     opcache_reset();
+	echo "my_onWorkerStart id= $worker_id\n";
     include "hot_update_class.php";
+    
+// 	echo "my_onWorkerStart HotUpdate begin id= $worker_id\n";
     $class = new HotUpdate();
+// 	echo "my_onWorkerStart HotUpdate end id= $worker_id\n";
+	  $class->test();
+
     if($worker_id >= $serv->setting['worker_num']) {
         swoole_set_process_name("php {$argv[0]} task worker");
     } else {
@@ -58,15 +64,18 @@ function my_onWorkerStart($serv, $worker_id)
 
 function my_onWorkerStop($serv, $worker_id)
 {
-	echo "WorkerStop[$worker_id]|pid=".posix_getpid().".\n";
+	echo "Worker Stop[$worker_id]|pid=".posix_getpid().".\n";
 }
 
 function my_onReceive(swoole_server $serv, $fd, $from_id, $data)
 {
+	echo "333333333333333333333";
+	
 	$cmd = trim($data);
     if($cmd == "reload") 
     {
 		$serv->reload($serv);
+		
 	}
 	elseif($cmd == "task") 
     {
