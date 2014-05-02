@@ -2,10 +2,10 @@
 $serv = new swoole_server("127.0.0.1", 9501);
 
 $serv->set(array(
-    'worker_num' => 2,
+    'worker_num' => 3,
     //'open_eof_check' => true,
     //'package_eof' => "\r\n",
-    'task_worker_num' => 2,
+    'task_worker_num' => 3,
     //'dispatch_mode' => 2,
     //'daemonize' => 1,
     //'heartbeat_idle_time' => 5,
@@ -30,13 +30,13 @@ function my_onTimer($serv, $interval)
 
 function my_onClose($serv, $fd, $from_id)
 {
-    //echo "Client: fd=$fd is closed.\n";
+    echo "Client: fd=$fd is closed.\n";
 }
 
 function my_onConnect($serv, $fd, $from_id)
 {
     //throw new Exception("hello world");
-//  echo "Client:Connect.\n";
+ echo "Client:Connect.\n";
 }
 
 function my_onWorkerStart($serv, $worker_id)
@@ -114,6 +114,7 @@ function my_onReceive(swoole_server $serv, $fd, $from_id, $data)
                     break;
                 case "set":
                     $serv->task(json_encode($data), 0);
+                    $serv->send($fd, "ok".PHP_EOL);
                     break;
                 case "del":
                     $serv->task(json_encode($data), 0);
@@ -136,18 +137,20 @@ function my_onTask(swoole_server $serv, $task_id, $from_id, $data)
 {
     static $datas = array();
     $data = json_decode($data, true);
+//     echo "onTask:".$data;
     if(isset($data['cmd'])) {
+    	echo $data['cmd']."ing...........";
         switch ($data['cmd']) {
             case 'get':
                 $key = $data['key'];
-                $result = isset($datas[$key]) ? $datas[$key] : "";
-                $serv->finish($result);
+//                 $result = isset($datas[$key]) ? $datas[$key] : "";
+                return "get"; 
                 break;
             case "set":
                 $key = $data['key'];
                 $val = $data['val']."_".$from_id;
                 $datas[$key] = $val;
-                return;
+                return "ok"; 
                 break;
             case "del":
                 $key = $data['key'];
@@ -159,16 +162,17 @@ function my_onTask(swoole_server $serv, $task_id, $from_id, $data)
     }
 
     
-    //echo "AsyncTask[PID=".posix_getpid()."]: task_id=$task_id.".PHP_EOL;
-    //$serv->finish("OK");
+//     echo "AsyncTask[PID=".posix_getpid()."]: task_id=$task_id.".PHP_EOL;
+//     $serv->finish("OK");
 }
 
-function my_onFinish(swoole_server $serv, $data)
+function my_onFinish( $serv,  $task_id,  $data)
 {
+	echo "my_onFinish:".$data."\n";
     echo "AsyncTask Finish:Connect.PID=".posix_getpid().PHP_EOL;
 }
 
-function my_onWorkerError(swoole_server $serv, $data)
+function my_onWorkerError(swoole_server $serv, int $worker_id, int $worker_pid, int $exit_code)
 {
     echo "worker abnormal exit. WorkerId=$worker_id|Pid=$worker_pid|ExitCode=$exit_code\n";
 }

@@ -7,7 +7,7 @@ if(!$client->connect('127.0.0.1', 9501))
 function help()
 {
 	echo "get eg: php ".__FILE__." get key".PHP_EOL;
-	echo "set eg: php ".__FILE__." get key value".PHP_EOL;
+	echo "set eg: php ".__FILE__." set key value".PHP_EOL;
 	echo "det eg: php ".__FILE__." del key".PHP_EOL;
 	exit();
 }
@@ -29,3 +29,11 @@ if(empty($sends)) {
 $client->send(json_encode($sends));
 $data = $client->recv();
 var_dump($data);
+// $client->close();
+// echo "closed!".PHP_EOL;
+while(1){
+	$data = $client->recv();
+	var_dump($data);
+	sleep(1);
+};
+
